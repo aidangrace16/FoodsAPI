@@ -1,39 +1,48 @@
 // Populate the area dropdown when the page loads
-window.addEventListener("DOMContentLoaded", function () {
+window.addEventListener("DOMContentLoaded", async function () {
   const areaSelect = document.getElementById("area-select");
   const categorySelect = document.getElementById("category-select");
 
-  // Reset dropdowns
+  // Reset dropdowns to their default state
   areaSelect.innerHTML = '<option value="">Select Area</option>';
   categorySelect.innerHTML = '<option value="">Select Category</option>';
 
-  // Fetch and populate areas
-  fetch("https://www.themealdb.com/api/json/v1/1/list.php?a=list")
-    .then((response) => response.json())
-    .then((data) => {
-      if (data.meals) {
-        data.meals.forEach((areaObj) => {
-          const option = document.createElement("option");
-          option.value = areaObj.strArea;
-          option.textContent = areaObj.strArea;
-          areaSelect.appendChild(option);
-        });
-      }
-    });
+  try {
+    // Fetch and populate areas using async/await
+    const areaResponse = await fetch(
+      "https://www.themealdb.com/api/json/v1/1/list.php?a=list"
+    );
+    const areaData = await areaResponse.json();
 
-  // Fetch and populate categories
-  fetch("https://www.themealdb.com/api/json/v1/1/list.php?c=list")
-    .then((response) => response.json())
-    .then((data) => {
-      if (data.meals) {
-        data.meals.forEach((categoryObj) => {
-          const option = document.createElement("option");
-          option.value = categoryObj.strCategory;
-          option.textContent = categoryObj.strCategory;
-          categorySelect.appendChild(option);
-        });
-      }
-    });
+    // Check if we received area data and populate the dropdown
+    if (areaData.meals) {
+      areaData.meals.forEach((areaObj) => {
+        const option = document.createElement("option");
+        option.value = areaObj.strArea;
+        option.textContent = areaObj.strArea;
+        areaSelect.appendChild(option);
+      });
+    }
+
+    // Fetch and populate categories using async/await
+    const categoryResponse = await fetch(
+      "https://www.themealdb.com/api/json/v1/1/list.php?c=list"
+    );
+    const categoryData = await categoryResponse.json();
+
+    // Check if we received category data and populate the dropdown
+    if (categoryData.meals) {
+      categoryData.meals.forEach((categoryObj) => {
+        const option = document.createElement("option");
+        option.value = categoryObj.strCategory;
+        option.textContent = categoryObj.strCategory;
+        categorySelect.appendChild(option);
+      });
+    }
+  } catch (error) {
+    // Handle any errors that might occur during API calls
+    console.error("Error fetching dropdown data:", error);
+  }
 });
 
 // Function to fetch detailed meal information by ID
